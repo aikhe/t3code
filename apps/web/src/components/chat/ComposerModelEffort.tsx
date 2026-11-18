@@ -8,7 +8,7 @@ import type { ProviderOptionDescriptor } from "@t3tools/contracts";
 import type { EffortDisplay } from "@t3tools/contracts/settings";
 import { getProviderOptionCurrentLabel } from "@t3tools/shared/model";
 import { msg, T, useGT, useMessages } from "gt-react";
-import { CheckIcon, ChevronRightIcon, GaugeIcon, WorkflowIcon } from "lucide-react";
+import { CheckIcon, ChevronRightIcon, WorkflowIcon } from "lucide-react";
 import { type KeyboardEvent, type ReactNode, use, useRef, useState } from "react";
 
 import { m, type MessageResolver } from "~/i18n/messages";
@@ -39,25 +39,6 @@ import {
 type SelectDescriptor = Extract<ProviderOptionDescriptor, { type: "select" }>;
 type BooleanDescriptor = Extract<ProviderOptionDescriptor, { type: "boolean" }>;
 
-/** Service tiers, Claude's Fast mode, and Ultracode sit in the footer, not the column. */
-function splitSpeed(
-  selects: ReadonlyArray<SelectDescriptor>,
-  toggles: ReadonlyArray<BooleanDescriptor>,
-) {
-  const speedSelect = selects.find((descriptor) => descriptor.id === "serviceTier") ?? null;
-  const fastToggle = toggles.find((descriptor) => descriptor.id === "fastMode") ?? null;
-  const ultracodeToggle = toggles.find((descriptor) => descriptor.id === "ultracode") ?? null;
-  return {
-    speedSelect,
-    fastToggle,
-    ultracodeToggle,
-    columnSelects: selects.filter((descriptor) => descriptor !== speedSelect),
-    columnToggles: toggles.filter(
-      (descriptor) => descriptor !== fastToggle && descriptor !== ultracodeToggle,
-    ),
-  };
-}
-
 type ColumnControl =
   | { kind: "select"; descriptor: SelectDescriptor }
   | { kind: "boolean"; descriptor: BooleanDescriptor };
@@ -70,10 +51,9 @@ function columnControls(
   selects: ReadonlyArray<SelectDescriptor>,
   toggles: ReadonlyArray<BooleanDescriptor>,
 ) {
-  const { columnSelects, columnToggles } = splitSpeed(selects, toggles);
   const controls: ReadonlyArray<ColumnControl> = [
-    ...columnSelects.map((descriptor) => ({ kind: "select" as const, descriptor })),
-    ...columnToggles.map((descriptor) => ({ kind: "boolean" as const, descriptor })),
+    ...selects.map((descriptor) => ({ kind: "select" as const, descriptor })),
+    ...toggles.map((descriptor) => ({ kind: "boolean" as const, descriptor })),
   ];
   const effort = controls.find((control) => isReasoningControl(control.descriptor)) ?? null;
   return { effort, others: controls.filter((control) => control !== effort) };
@@ -147,12 +127,9 @@ export function describeComposerEffort(
     suffix: (
       <>
         {word || !glyph ? (
-          <>
-            <GaugeIcon aria-hidden="true" className="size-3" />
-            <span data-composer-control-label className="max-w-24 truncate">
-              {word ?? (fast ? display.speedLabel : resolve(msg("Fast mode")))}
-            </span>
-          </>
+          <span data-composer-control-label className="max-w-24 truncate">
+            {word ?? (fast ? display.speedLabel : resolve(msg("Fast mode")))}
+          </span>
         ) : glyph ? (
           <EffortGlyph count={glyph.count} filled={glyph.filled} size={size} />
         ) : null}
@@ -160,20 +137,11 @@ export function describeComposerEffort(
           <span data-composer-control-label>{display.speedLabel}</span>
         ) : null}
         {display.ultracode ? (
-          <WorkflowIcon aria-hidden="true" data-composer-control-icon className="size-3" />
+          <WorkflowIcon aria-hidden="true" data-composer-control-icon className="size-3.25" />
         ) : null}
       </>
     ),
   };
-}
-
-/** Model-specific options stay beside the fixed-width model list. */
-export function hasComposerModelOptions(input: TraitsSelectionInput | null) {
-  if (!input) return false;
-  const visibility = getTraitsSectionVisibility(input);
-  return (
-    columnControls(visibility.selectDescriptors, visibility.booleanDescriptors).others.length > 0
-  );
 }
 
 /** A separate reasoning menu, with the canvas's Fast mode section below the levels. */

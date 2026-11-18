@@ -433,7 +433,11 @@ export const ProviderModelPicker = memo(function ProviderModelPicker(props: {
                 showBadge={showInstanceBadge}
                 className="size-4"
                 iconClassName={cn(
-                  props.triggerVariant === "settings" ? "size-3.5" : "size-[11px]",
+                  props.triggerVariant === "settings"
+                    ? "size-3.5"
+                    : props.isComposerOwned
+                      ? "size-3.25"
+                      : "size-[11px]",
                   props.activeProviderIconClassName,
                 )}
                 indicatorBackground={props.instanceIndicatorBackground ?? "var(--contrast-input)"}

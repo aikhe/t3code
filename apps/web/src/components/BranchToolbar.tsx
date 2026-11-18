@@ -94,7 +94,6 @@ import {
   resolveRestingComposerControlsMinimumWidth,
   resolveRestingComposerControlsNarrowestWidth,
 } from "./composerFooterLayout";
-import { NoProjectChip } from "./chat/NoProjectChip";
 import { useComposerMenuProps } from "./chat/composerEventScope";
 import { cn } from "~/lib/utils";
 
@@ -243,7 +242,7 @@ const WorkspaceMenu = memo(function WorkspaceMenu({
       : effectiveEnvMode === "worktree"
         ? resolveEnvModeLabel("worktree", m)
         : resolveCurrentWorkspaceLabel(activeWorktreePath, m);
-  const icon = <WorkspaceIcon aria-hidden className="size-3 shrink-0" />;
+  const icon = <WorkspaceIcon aria-hidden className="size-3.25 shrink-0" />;
 
   if (envModeLocked && !branch) {
     return (
@@ -251,7 +250,7 @@ const WorkspaceMenu = memo(function WorkspaceMenu({
         <TooltipTrigger
           render={
             <span
-              className="inline-flex h-7 shrink-0 items-center ps-2 pe-0.5 text-muted-foreground sm:h-5.5"
+              className="inline-flex h-7 shrink-0 items-center ps-2 pe-0.5 text-muted-foreground sm:h-6"
               data-composer-context-control
               aria-label={workspaceLabel}
             />
@@ -439,11 +438,11 @@ const MachineMenu = memo(function MachineMenu({
   const environmentLabel = autoEnvironmentLabel ?? activeEnvironment?.label ?? environmentId;
   const canPickEnvironment = (showEnvironmentPicker && !envLocked) || addTargets.length > 0;
   const icon = autoEnvironmentLabel ? (
-    <ScaleIcon aria-hidden className="size-3 shrink-0" />
+    <ScaleIcon aria-hidden className="size-3.25 shrink-0" />
   ) : (
     <EnvironmentMachineIcon
       kind={activeEnvironment?.machine ?? "server"}
-      className="size-3 shrink-0"
+      className="size-3.25 shrink-0"
     />
   );
   const tooltip = (
@@ -461,7 +460,7 @@ const MachineMenu = memo(function MachineMenu({
           render={
             <span
               className={cn(
-                "inline-flex h-7 max-w-[48%] shrink-0 items-center justify-start gap-1.5 rounded-md border border-transparent ps-2 pe-1.75 text-meta text-dim-foreground sm:h-6",
+                "inline-flex h-7 max-w-[48%] shrink-0 items-center justify-start gap-1.5 rounded-md border border-transparent ps-2 pe-1.75 text-control text-dim-foreground sm:h-6",
                 environmentUnavailable && "text-warning-foreground",
               )}
               aria-label={gt("Run on: {environment}", { environment: environmentLabel })}
@@ -752,7 +751,9 @@ const RunContextSelector = memo(function RunContextSelector({
   const workspaceIcon = (
     <Tooltip>
       <TooltipTrigger render={<span className="inline-flex shrink-0" />}>
-        <WorkspaceIcon className={isPanel ? THREAD_DETAILS_PANEL_ICON_CLASS : "size-3 shrink-0"} />
+        <WorkspaceIcon
+          className={isPanel ? THREAD_DETAILS_PANEL_ICON_CLASS : "size-3.25 shrink-0"}
+        />
       </TooltipTrigger>
       <TooltipPopup>
         {isPanel
@@ -768,7 +769,7 @@ const RunContextSelector = memo(function RunContextSelector({
       <TooltipTrigger render={<span className="inline-flex shrink-0" />}>
         {autoEnvironmentLabel ? (
           <ScaleIcon
-            className={isPanel ? THREAD_DETAILS_PANEL_ICON_CLASS : "size-3 shrink-0"}
+            className={isPanel ? THREAD_DETAILS_PANEL_ICON_CLASS : "size-3.25 shrink-0"}
             aria-hidden="true"
           />
         ) : (
@@ -776,7 +777,9 @@ const RunContextSelector = memo(function RunContextSelector({
             kind={activeEnvironment?.machine ?? "server"}
             // Wide machine glyphs need a little more box to match the square row icons.
             className={
-              isPanel ? cn(THREAD_DETAILS_PANEL_ICON_CLASS, "-mx-px size-4.5") : "size-3 shrink-0"
+              isPanel
+                ? cn(THREAD_DETAILS_PANEL_ICON_CLASS, "-mx-px size-4.5")
+                : "size-3.25 shrink-0"
             }
           />
         )}
@@ -825,7 +828,7 @@ const RunContextSelector = memo(function RunContextSelector({
         className={cn(
           isPanel
             ? THREAD_DETAILS_PANEL_LOCKED_ROW_CLASS
-            : "inline-flex h-7 min-w-0 max-w-[48%] flex-initial items-center justify-start gap-1 rounded-md border border-transparent ps-2 pe-1.75 text-meta text-dim-foreground sm:h-6",
+            : "inline-flex h-7 min-w-0 max-w-[48%] flex-initial items-center justify-start gap-1 rounded-md border border-transparent ps-2 pe-1.75 text-control text-dim-foreground sm:h-6",
         )}
         onContextMenu={handleContextMenu}
         aria-label={isPanel ? runContextLabel : undefined}
@@ -1405,9 +1408,6 @@ export const BranchToolbar = memo(function BranchToolbar({
       data-compact={stripCompaction === "none" ? undefined : stripCompaction}
       data-composer-context-control
     >
-      {isScratchProject(activeProject, scratchWorkspaceRoot) ? (
-        <NoProjectChip started={isServerThread} />
-      ) : null}
       {machineMenu}
       {!showGitControls && !onOpenWorkspaceDetails ? (
         <WorkspaceMenu {...workspaceMenuProps} />

@@ -49,7 +49,6 @@ import type { TimelineEntry } from "../session-logic";
 import { useProject, useThreadShell } from "../state/entities";
 import type { LayoutTab } from "./layoutModel";
 import {
-  LAYOUT_TAB_ICON_CLASS,
   LAYOUT_TAB_SLOT_CLASS,
   LayoutPaneTab,
   usePaneSiblingTabs,
@@ -300,7 +299,7 @@ function PaneThumbnailHeader({
           ))}
           <span className={LAYOUT_TAB_SLOT_CLASS}>
             <div className={PANE_TAB_CLASS}>
-              <span className={LAYOUT_TAB_ICON_CLASS}>{label.icon}</span>
+              {label.icon}
               <span className="min-w-0 truncate">{label.title}</span>
             </div>
           </span>
@@ -309,8 +308,8 @@ function PaneThumbnailHeader({
           ))}
         </div>
         {tab.content.kind === "chat" ? (
-          <Button variant="bare" size="icon-xs" data-pane-notch-add="" tabIndex={-1}>
-            <ThumbnailIcon name="plus" />
+          <Button variant="ghost-muted" size="icon-sm" data-pane-notch-add="" tabIndex={-1}>
+            <ThumbnailIcon name="plus" className="stroke-2" />
           </Button>
         ) : null}
       </PaneNotch>

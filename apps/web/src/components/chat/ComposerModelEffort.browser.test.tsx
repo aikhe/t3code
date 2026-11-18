@@ -59,6 +59,17 @@ const models: ReadonlyArray<ServerProviderModel> = [
           ],
         },
         { id: "auto_approve", label: "Auto-approve tools", type: "boolean", currentValue: false },
+        {
+          id: "serviceTier",
+          label: "Service tier",
+          type: "select",
+          currentValue: "auto",
+          options: [
+            { id: "auto", label: "Auto" },
+            { id: "fast", label: "Fast" },
+          ],
+        },
+        { id: "fastMode", label: "Fast mode", type: "boolean", currentValue: false },
       ],
     }),
   },
@@ -125,6 +136,17 @@ it("draws an agent's reasoning as bars and keeps its mode out of the levels", as
     .element(screen.getByRole("button", { name: "Session Mode: Plan" }))
     .toBeInTheDocument();
   await expect.element(page.getByRole("menuitemradio")).not.toBeInTheDocument();
+
+  // Speed controls must stay reachable beside the model's reasoning levels.
+  await userEvent.click(screen.getByRole("button", { name: "Service tier: Auto" }));
+  await userEvent.click(page.getByRole("menuitemradio", { name: "Fast", exact: true }));
+  await expect
+    .element(screen.getByRole("button", { name: "Service tier: Fast" }))
+    .toBeInTheDocument();
+  await userEvent.click(screen.getByText("Fast mode", { exact: true }));
+  await expect
+    .element(screen.getByRole("switch", { name: "Fast mode", exact: true }))
+    .toHaveAttribute("aria-checked", "true");
 });
 
 it("shows Ultracode on the reasoning trigger after enabling it", async () => {

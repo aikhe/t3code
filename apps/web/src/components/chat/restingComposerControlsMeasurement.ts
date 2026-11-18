@@ -41,9 +41,15 @@ function providerModelPickerIconOnlyWidth(picker: HTMLElement, scale: number): n
       ? wrapper.firstElementChild
       : wrapper;
   if (!label || !(icon instanceof HTMLElement) || icon === label) return undefined;
+  const effort = picker.querySelector<HTMLElement>("[data-composer-model-effort]");
+  const effortWidth = effort
+    ? elementOuterWidth(effort, scale) +
+      (Number.parseFloat(getComputedStyle(label.parentElement!).columnGap) || 0)
+    : 0;
   return (
     horizontalBoxWidth(getComputedStyle(picker)) +
     elementOuterWidth(icon, scale) +
+    effortWidth +
     elementInlineMarginWidth(label.parentElement!) +
     elementInlineMarginWidth(picker)
   );

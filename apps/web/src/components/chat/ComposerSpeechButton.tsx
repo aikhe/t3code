@@ -249,7 +249,7 @@ export function ComposerSpeechButton(props: {
   const glyph = isRecording ? (
     <ComposerSpeechBars level={dictation?.level ?? 0} inPill={inPill} />
   ) : phase === "idle" ? (
-    <MicIcon className={cn("text-composer-icon", inPill && "size-3.5")} />
+    <MicIcon className={cn("text-composer-icon", inPill && "size-[15px]")} />
   ) : (
     // The spinner draws in currentColor, so the wrapper gives it the mic glyph's colour.
     <span aria-hidden className="flex text-composer-icon">

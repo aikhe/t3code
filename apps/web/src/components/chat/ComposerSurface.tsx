@@ -15,7 +15,7 @@ function Shell({
       data-context-row={contextRow || undefined}
       className={cn(
         "@container/composer-surface group/composer-surface relative isolate mx-auto flex w-full max-w-(--chat-content-max-width) flex-col rounded-2xl surface-tray border-0!",
-        // Paint the rim above the main surface without expanding the 48px + 30px stack.
+        // Paint the rim above the main surface without expanding the 48px + 32px stack.
         "after:pointer-events-none after:absolute after:inset-0 after:z-20 after:rounded-[inherit] after:border after:border-(--tray-stroke)",
         "[--chat-composer-surface:var(--popover)] [--chat-composer-outline:var(--tray-stroke)]",
         className,
@@ -51,7 +51,7 @@ function ContextStrip({ className, ...props }: ComponentProps<"div">) {
       // 8px on the right, so a trailing chip's hover fill ends on the send pill's edge; 5px on
       // the left, so the first chip's icon (after its 1px border and 8px padding) sits on the text line.
       className={cn(
-        "group/composer-context relative flex h-7.5 min-w-0 items-center gap-1 ps-1.25 pe-2 py-1 text-meta text-muted-foreground",
+        "group/composer-context relative flex h-8 min-w-0 items-center gap-1 ps-1.25 pe-2 py-1 text-control text-muted-foreground",
         className,
       )}
       {...props}

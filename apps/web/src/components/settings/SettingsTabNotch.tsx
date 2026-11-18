@@ -4,8 +4,8 @@ import type { ReactNode } from "react";
 
 import { isElectron } from "../../env";
 import {
-  LAYOUT_TAB_ICON_CLASS,
   LAYOUT_TAB_SLOT_CLASS,
+  LAYOUT_TAB_TITLE_FADE_CLASS,
   LayoutPaneTab,
   LayoutNewTabButton,
   LayoutPaneTabStrip,
@@ -51,8 +51,10 @@ export function SettingsTabNotch({
               void showLayoutTabMenu(tabId, { x: event.clientX, y: event.clientY }, keybindings);
             }}
           >
-            <span className={LAYOUT_TAB_ICON_CLASS}>{icon}</span>
-            {children}
+            {icon}
+            <div className={cn("min-w-0", tabId !== null && LAYOUT_TAB_TITLE_FADE_CLASS)}>
+              {children}
+            </div>
           </div>
           {tabId !== null ? (
             <LayoutTabCloseButton tabId={tabId} title={title ?? gt("Settings")} />

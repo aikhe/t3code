@@ -8,7 +8,7 @@ export type ComposerControlSize = "sm" | "xs";
 export type ComposerControlVariant = "toolbar" | "settings";
 
 /**
- * The composer toolbar's control look. `sm` is the expanded toolbar; `xs` is the quiet 22px chip in
+ * The composer toolbar's control look. `sm` is the expanded toolbar; `xs` is the quiet 24px chip in
  * the tray row. `aria-pressed` marks a toggle that is on (plan mode).
  */
 function composerControlClassName(
@@ -20,7 +20,7 @@ function composerControlClassName(
     "relative inline-flex shrink-0 cursor-pointer items-center justify-center whitespace-nowrap rounded-(--control-radius) border border-transparent text-base outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring focus-visible:ring-offset-1 focus-visible:ring-offset-background disabled:pointer-events-none disabled:opacity-64 data-disabled:pointer-events-none data-disabled:opacity-64 pointer-coarse:after:absolute pointer-coarse:after:size-full pointer-coarse:after:min-h-11 pointer-coarse:after:min-w-11 [&:active:not([aria-haspopup])]:scale-[0.97] [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg]:-mx-0.5 [&_svg[data-composer-control-icon]]:mx-0",
     "[&_:is([data-composer-control-label],[data-chat-provider-model-picker-label])]:[text-box:trim-both_cap_alphabetic] supports-[text-box:trim-both_cap_alphabetic]:[&_:is([data-composer-control-label],[data-chat-provider-model-picker-label])]:py-1.5",
     size === "xs"
-      ? "h-5.5 gap-1.25 has-[[data-composer-label]]:gap-1.5 px-2 text-meta text-muted-foreground hover:text-foreground [&_svg]:mx-0 [&_svg:not([class*='size-'])]:size-3 has-[svg[data-composer-chevron]]:pe-1.25"
+      ? "h-6 gap-1.5 px-2 text-control text-muted-foreground hover:text-foreground [&_svg]:mx-0 [&_svg:not([class*='size-'])]:size-3.25 has-[svg[data-composer-chevron]]:pe-1.25"
       : "h-7 gap-1.5 px-2.5 font-medium text-secondary-label [&_svg:not([class*='text-'])]:text-muted-foreground hover:text-foreground sm:text-sm [&_svg:not([class*='size-'])]:size-4.5 sm:[&_svg:not([class*='size-'])]:size-4",
     "aria-pressed:surface-selected-soft aria-pressed:text-strong-foreground aria-pressed:hover:surface-ghost-hover",
     variant === "settings"
@@ -71,7 +71,7 @@ export function ComposerControlIcon({
       aria-hidden="true"
       className={cn(
         "shrink-0",
-        size === "xs" ? "size-3" : opticalSize === "large" ? "size-4.5" : "size-4",
+        size === "xs" ? "size-3.25" : opticalSize === "large" ? "size-4.5" : "size-4",
         className,
       )}
       data-composer-control-icon

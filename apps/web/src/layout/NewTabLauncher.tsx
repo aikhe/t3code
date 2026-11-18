@@ -60,8 +60,8 @@ import { canCloseLayoutTab, selectLayoutWayBack, type LayoutPageContent } from "
 import { useOpenLayoutPage } from "./pageNavigation";
 import { runInNewLayoutTab, useLayoutStore } from "./layoutStore";
 import {
-  LAYOUT_TAB_ICON_CLASS,
   LAYOUT_TAB_SLOT_CLASS,
+  LAYOUT_TAB_TITLE_FADE_CLASS,
   LayoutPaneTab,
   LayoutPaneTabStrip,
   LayoutNewTabButton,
@@ -474,8 +474,8 @@ function LauncherTabNotch({ tabId }: { tabId: string | null }) {
               void showLayoutTabMenu(tabId, { x: event.clientX, y: event.clientY }, keybindings);
             }}
           >
-            {closable ? <span className={LAYOUT_TAB_ICON_CLASS}>{icon}</span> : icon}
-            <span className="truncate">
+            {icon}
+            <span className={cn("truncate", closable && LAYOUT_TAB_TITLE_FADE_CLASS)}>
               <T>New tab</T>
             </span>
           </div>

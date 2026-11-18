@@ -423,7 +423,7 @@ function moveJoin(
   const middle = (width: number) => Math.max(0, width - 2 * PANE_JOIN_RADIUS_PX);
   join.style.setProperty("--jx", `${to.x}px`);
   join.style.setProperty("--jw", `${to.w}px`);
-  join.style.setProperty("--jm", String(middle(to.w)));
+  join.style.setProperty("--jm", `${middle(to.w)}px`);
   markJoinAtStart(entry);
   markPaneLit(entry, entry.strip.scrollLeft);
   const land = () => {
@@ -460,10 +460,14 @@ function moveJoin(
     [{ translate: `${from.x + from.w - r - 1}px 0` }, { translate: `${to.x + to.w - r - 1}px 0` }],
     timing,
   );
+  // The middle is laid out at the target width, so it scales from the old one to 1.
   const slide = piece("[data-jm]")?.animate(
     [
-      { translate: `${from.x + r}px 0`, scale: `${middle(from.w)} 1` },
-      { translate: `${to.x + r}px 0`, scale: `${middle(to.w)} 1` },
+      {
+        translate: `${from.x + r}px 0`,
+        scale: `${middle(from.w) / Math.max(1, middle(to.w))} 1`,
+      },
+      { translate: `${to.x + r}px 0`, scale: "1 1" },
     ],
     timing,
   );
@@ -965,48 +969,50 @@ export function closeLayoutTabOnMiddleClick(event: ReactMouseEvent, tabId: strin
   closeLayoutTabByUser(tabId);
 }
 
-/** Holds a notch tab and its close button. */
-export const LAYOUT_TAB_SLOT_CLASS =
-  "group/tab relative inline-flex max-w-full shrink-0 items-center hover:[--tab-icon-visibility:hidden] has-[[data-tab-close]:focus-visible]:[--tab-icon-visibility:hidden]";
-
 /**
- * Wraps a notch tab's icon so the close button can take its place: the icon
- * hides while the tab is hovered or the button has keyboard focus. The slot sets the
- * variable; a `:has()` here, above the icon, would restyle every element
- * below each tab on any DOM change.
+ * Holds a notch tab and its close button. While the tab is hovered or the
+ * button has keyboard focus it sets the mask a title under the button takes.
+ * The slot sets it; a `:has()` on the title would restyle every element below
+ * each tab on any DOM change.
  */
-export const LAYOUT_TAB_ICON_CLASS = "contents [visibility:var(--tab-icon-visibility)]";
+export const LAYOUT_TAB_SLOT_CLASS =
+  "group/tab relative inline-flex max-w-full shrink-0 items-center [--tab-close-fade:linear-gradient(to_right,#000_calc(100%_-_2.25rem),transparent_calc(100%_-_1.25rem))] hover:[--tab-title-mask:var(--tab-close-fade)] has-[[data-tab-close]:focus-visible]:[--tab-title-mask:var(--tab-close-fade)]";
+
+/** A title the close button sits over: its end fades out while the button shows, as in browser tabs. */
+export const LAYOUT_TAB_TITLE_FADE_CLASS = "[mask-image:var(--tab-title-mask,none)]";
 
 /**
- * A notch tab's close button: a 12px x over the tab's icon, shown while the
+ * A notch tab's close button: a 12px x at the tab's end, shown while the
  * pointer is on the tab or the button has keyboard focus. Render it after
- * the tab inside `LAYOUT_TAB_SLOT_CLASS`, with the tab's icon wrapped in
- * `LAYOUT_TAB_ICON_CLASS`.
+ * the tab inside `LAYOUT_TAB_SLOT_CLASS`, with the tab's title in
+ * `LAYOUT_TAB_TITLE_FADE_CLASS`.
  */
 export function LayoutTabCloseButton({ tabId, title }: { tabId: string; title: string }) {
   const gt = useGT();
   const keybindings = useAtomValue(primaryServerKeybindingsAtom);
   const shortcut = shortcutLabelForCommand(keybindings, "tab.close");
   return (
-    <Tooltip>
-      <TooltipTrigger
-        render={
-          <ContentButton
-            variant="tab-close"
-            type="button"
-            aria-label={gt("Close {title}", { title })}
-            className="absolute start-2.25 top-1/2 -translate-y-1/2"
-            data-tab-close=""
-            onClick={() => closeLayoutTabByUser(tabId)}
-          />
-        }
-      >
-        <XIcon aria-hidden className="size-3" />
-      </TooltipTrigger>
-      <TooltipPopup side="bottom">
-        {shortcut ? gt("Close tab ({shortcut})", { shortcut }) : gt("Close tab")}
-      </TooltipPopup>
-    </Tooltip>
+    <span className="absolute end-1 top-1/2 flex -translate-y-1/2 opacity-0 [-webkit-app-region:no-drag] group-hover/tab:opacity-100 focus-within:opacity-100">
+      <Tooltip>
+        <TooltipTrigger
+          render={
+            <Button
+              size="icon-micro"
+              variant="ghost-muted"
+              type="button"
+              aria-label={gt("Close {title}", { title })}
+              data-tab-close=""
+              onClick={() => closeLayoutTabByUser(tabId)}
+            />
+          }
+        >
+          <XIcon aria-hidden className="size-3.5 stroke-2" />
+        </TooltipTrigger>
+        <TooltipPopup side="bottom">
+          {shortcut ? gt("Close tab ({shortcut})", { shortcut }) : gt("Close tab")}
+        </TooltipPopup>
+      </Tooltip>
+    </span>
   );
 }
 
@@ -1019,8 +1025,8 @@ export function LayoutNewTabButton({ tabId }: { tabId: string | null }) {
       <TooltipTrigger
         render={
           <Button
-            variant="bare"
-            size="icon-xs"
+            variant="ghost-muted"
+            size="icon-sm"
             data-pane-notch-add=""
             data-layout-new-tab=""
             aria-label={gt("New tab")}
@@ -1037,7 +1043,7 @@ export function LayoutNewTabButton({ tabId }: { tabId: string | null }) {
           />
         }
       >
-        <PlusIcon />
+        <PlusIcon className="stroke-2" />
       </TooltipTrigger>
       <TooltipPopup side="bottom">
         {shortcut ? gt("New tab ({shortcut})", { shortcut }) : gt("New tab")}
@@ -1132,10 +1138,11 @@ function LayoutPaneTabButton({
             />
           }
         >
-          <span className={LAYOUT_TAB_ICON_CLASS}>{label.icon}</span>
+          {label.icon}
           <span
             className={cn(
               PANE_INACTIVE_TAB_TITLE_CLASS,
+              LAYOUT_TAB_TITLE_FADE_CLASS,
               isLayoutGhostTab(tab) && PANE_GHOST_TAB_TITLE_CLASS,
             )}
             dir={textDirection(label.title)}

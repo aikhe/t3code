@@ -72,7 +72,7 @@ export const ComposerFooterModeControls = memo(function ComposerFooterModeContro
             icon={RuntimeModeIcon}
             size={size}
             // Match the label, not full foreground: the chip's presence already marks the mode.
-            className={props.emphasized ? "size-3 text-current" : "size-3"}
+            className={props.emphasized ? "text-current" : undefined}
           />
           <span
             data-composer-control-label

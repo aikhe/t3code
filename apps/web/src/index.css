@@ -6682,7 +6682,7 @@ body {
       color: var(--pane-bar-fg);
       --jx: 0px;
       --jw: 0px;
-      --jm: 0;
+      --jm: 0px;
       --e: var(--pane-join-ear);
       --r: var(--pane-join-radius);
 
@@ -6789,13 +6789,20 @@ body {
         mask: linear-gradient(to right, transparent, #000);
       }
 
+      /* Laid out at its real width: a 1px layer scaled up to the tab's width
+         overshot the tab's corner by its raster error at fractional zoom. */
       & [data-jm] {
-        width: 1px;
+        width: var(--jm);
         height: 100%;
         transform-origin: 0 0;
         translate: calc(var(--jx) + var(--r)) 0;
-        scale: var(--jm) 1;
         background: var(--pane-join-fill);
+      }
+
+      /* The fill runs 1px under the foot, so at fractional zoom the bar
+         never shows through the row it shares with the pane body. */
+      & :is([data-jm], [data-jf], [data-je]) {
+        box-shadow: 0 1px 0 var(--pane-join-fill);
       }
       & [data-jm]::after {
         content: "";

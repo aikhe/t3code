@@ -24,16 +24,12 @@ import { cn } from "~/lib/utils";
 import { resolveComposerTraitsInput } from "./composerProviderState";
 import { useApplyThreadModelPick } from "./useApplyThreadModelPick";
 import { useStableCallback } from "../../hooks/useStableCallback";
-import {
-  ComposerEffortColumn,
-  ComposerReasoningPicker,
-  hasComposerModelOptions,
-} from "./ComposerModelEffort";
+import { ComposerEffortColumn, describeComposerEffort } from "./ComposerModelEffort";
 import type { useComposerProviderModel } from "./useComposerProviderModel";
 import { resolveComposerControlsOwnership } from "./composerControlsOwnership";
 
 /**
- * The composer footer controls: separate model, reasoning and permission menus,
+ * The composer footer controls: a combined model/effort picker, permission menu,
  * and the overflow menu for blocks that do not fit. Rendered in the
  * expanded footer or the resting controls host.
  */
@@ -104,7 +100,6 @@ export function ComposerControlsBar(props: {
     handleRuntimeModeChange,
     restingHiddenBlockCount: measuredHiddenBlockCount,
     iconOnlyBlockCount,
-    traitsIconOnly,
     pickerIconOnly,
     showProviderUnavailable,
     providerSetupInstanceId,
@@ -157,6 +152,7 @@ export function ComposerControlsBar(props: {
     promptUltrathink,
     onPromptEdit,
   });
+  const effort = describeComposerEffort(traitsInput, props.effortDisplay, "sm");
   const restingBlockDefs = showModeBlock
     ? [
         {
@@ -206,21 +202,28 @@ export function ComposerControlsBar(props: {
       keybindings={keybindings}
       modelOptionsByInstance={modelOptionsByInstance}
       size="xs"
+      triggerDetail={effort.detail}
+      triggerShortcuts="composer.effort"
+      triggerSuffix={
+        effort.suffix ? (
+          <span
+            data-composer-model-effort
+            className="inline-flex shrink-0 items-center gap-1.25 ps-1 text-muted-foreground"
+          >
+            {effort.suffix}
+          </span>
+        ) : undefined
+      }
       triggerClassName={cn(
         "group/model-trigger",
         TEXT_CONTROL_STATES,
-        "text-meta!",
-        // Icon-only: the 16px icon box already pads its 11px glyph, so 6px matches the other chips' ink inset.
+        // Keep the same inset when the model name is hidden.
         "@max-[620px]/composer-surface:min-w-0 @max-[620px]/composer-surface:px-1.5 @max-[620px]/composer-surface:[&_[data-chat-provider-model-picker-label]]:pointer-events-none @max-[620px]/composer-surface:[&_[data-chat-provider-model-picker-label]]:invisible @max-[620px]/composer-surface:[&_[data-chat-provider-model-picker-label]]:absolute @max-[620px]/composer-surface:[&_[data-chat-provider-model-picker-label]]:w-max @max-[620px]/composer-surface:[&_[data-chat-provider-model-picker-label]]:max-w-none",
         pickerIconOnly
           ? "min-w-0 shrink-0 @min-[620px]/composer-surface:[&>span:has(>[data-chat-provider-model-picker-label])]:-mx-0.5 [&_[data-chat-provider-model-picker-label]]:pointer-events-none [&_[data-chat-provider-model-picker-label]]:invisible [&_[data-chat-provider-model-picker-label]]:absolute [&_[data-chat-provider-model-picker-label]]:w-max [&_[data-chat-provider-model-picker-label]]:max-w-none"
           : "shrink-0",
       )}
-      effortColumn={
-        hasComposerModelOptions(traitsInput) ? (
-          <ComposerEffortColumn traits={traitsInput} optionsOnly />
-        ) : undefined
-      }
+      effortColumn={<ComposerEffortColumn traits={traitsInput} />}
       terminalOpen={terminalOpen}
       open={modelPickerOpen}
       instanceIndicatorBackground="var(--chat-composer-surface)"
@@ -250,25 +253,6 @@ export function ComposerControlsBar(props: {
   ) : (
     <>
       {composerModelPicker}
-      {traitsInput ? (
-        <div
-          data-resting-fixed-control
-          data-composer-block-icon-only={traitsIconOnly ? "true" : "false"}
-          className={cn(
-            "flex shrink-0 items-center",
-            "@max-[620px]/composer-surface:[&_[data-composer-control-label]]:pointer-events-none @max-[620px]/composer-surface:[&_[data-composer-control-label]]:invisible @max-[620px]/composer-surface:[&_[data-composer-control-label]]:absolute @max-[620px]/composer-surface:[&_[data-composer-control-label]]:w-max @max-[620px]/composer-surface:[&_[data-composer-control-label]]:max-w-none",
-            traitsIconOnly &&
-              "[&_[data-composer-control-label]]:pointer-events-none [&_[data-composer-control-label]]:invisible [&_[data-composer-control-label]]:absolute [&_[data-composer-control-label]]:w-max [&_[data-composer-control-label]]:max-w-none",
-          )}
-        >
-          <ComposerReasoningPicker
-            traits={traitsInput}
-            effortDisplay={props.effortDisplay}
-            size="xs"
-            disabled={providerCatalogPending || isSendBusy}
-          />
-        </div>
-      ) : null}
 
       <>
         {restingBlockDefs.map((def, index) => {

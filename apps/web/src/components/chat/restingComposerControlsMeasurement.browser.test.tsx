@@ -12,15 +12,20 @@ const narrowHiddenLabel: CSSProperties = {
   width: "max-content",
 };
 
-function Controls({ iconOnly }: { iconOnly: boolean }) {
+function Controls({ iconOnly, combined = false }: { iconOnly: boolean; combined?: boolean }) {
   const compact = iconOnly ? "true" : "false";
   return (
-    <div data-testid={`controls-${compact}`} style={{ ...row, columnGap: 2 }}>
+    <div data-testid={`controls-${compact}-${combined}`} style={{ ...row, columnGap: 2 }}>
       <button type="button" data-chat-provider-model-picker style={row}>
         <span style={icon} />
         <span data-chat-provider-model-picker-label="true" style={narrowHiddenLabel}>
           Opus 5.5
         </span>
+        {combined ? (
+          <span data-composer-model-effort style={{ display: "inline-block", width: 48 }}>
+            High
+          </span>
+        ) : null}
       </button>
       <div data-resting-fixed-control data-composer-block-icon-only={compact} style={row}>
         <span style={icon} />
@@ -43,6 +48,8 @@ it("measures labels a narrow composer hides the same whether or not the controls
     <>
       <Controls iconOnly={false} />
       <Controls iconOnly />
+      <Controls iconOnly={false} combined />
+      <Controls iconOnly combined />
     </>,
   );
 
@@ -50,8 +57,11 @@ it("measures labels a narrow composer hides the same whether or not the controls
     const controls = screen.getByTestId(testId).element();
     return controls instanceof HTMLElement ? measureRestingComposerControls(controls) : null;
   };
-  const labelled = measure("controls-false");
-  const iconOnly = measure("controls-true");
+  const labelled = measure("controls-false-false");
+  const iconOnly = measure("controls-true-false");
   expect(labelled).not.toBeNull();
   expect(labelled).toEqual(iconOnly);
+  const combined = measure("controls-false-true");
+  expect(combined).toEqual(measure("controls-true-true"));
+  expect(combined!.iconOnlyFixedWidth! - labelled!.iconOnlyFixedWidth!).toBeCloseTo(52);
 });

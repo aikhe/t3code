@@ -48,8 +48,8 @@ import { textDirection } from "~/textDirection";
 import { GuestShareIndicator } from "./GuestShareControls";
 import { useLayoutPane } from "../../layout/layoutPaneContext";
 import {
-  LAYOUT_TAB_ICON_CLASS,
   LAYOUT_TAB_SLOT_CLASS,
+  LAYOUT_TAB_TITLE_FADE_CLASS,
   LayoutPaneTab,
   LayoutNewTabButton,
   LayoutPaneTabStrip,
@@ -404,11 +404,12 @@ export const ChatHeader = memo(function ChatHeader({
                     )
                   }
                 >
-                  <span className={LAYOUT_TAB_ICON_CLASS}>{tabIcon}</span>
+                  {tabIcon}
                   <h2
                     className={cn(
                       "min-w-0",
                       PANE_TAB_TITLE_CLASS,
+                      layoutTabId !== null && LAYOUT_TAB_TITLE_FADE_CLASS,
                       ghostShown && PANE_GHOST_TAB_TITLE_CLASS,
                     )}
                     dir={textDirection(activeThreadTitle)}
